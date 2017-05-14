@@ -48,7 +48,7 @@ int main(int argc,char *argv[])
     RGBTRIPLE white;
     white.rgbtBlue=0xff;white.rgbtGreen=0xff;white.rgbtRed=0xff;
     RGBTRIPLE red;
-    red.rgbtBlue=0xff;red.rgbtGreen=0x00;red.rgbtRed=0x00;
+    red.rgbtBlue=0x00;red.rgbtGreen=0x00;red.rgbtRed=0xff;
     int padding =  (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
     
     // iterate over infile's scanlines
@@ -64,24 +64,28 @@ int main(int argc,char *argv[])
             fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
 
             // write RGB triple to outfile
-           /* if(triple.rgbtBlue==0x00 && triple.rgbtGreen==0x00 && triple.rgbtRed==0xff)
+            if(triple.rgbtBlue==0x00 && triple.rgbtGreen==0x00 && triple.rgbtRed==0xff)
             {
                 fwrite(&white,sizeof(RGBTRIPLE), 1, outptr);
             }
-            else
+            else if(triple.rgbtBlue==0xff && triple.rgbtGreen==0xff && triple.rgbtRed==0xff)
             {
                 
-              fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+              fwrite(&white, sizeof(RGBTRIPLE), 1, outptr);
                 
-            }*/
-            if(!(triple.rgbtBlue==0xff && triple.rgbtGreen==0xff && triple.rgbtRed==0xff))
+            }
+            else
+            {
+                fwrite(&red ,sizeof(RGBTRIPLE),1,outptr);
+            }
+           /* if(!(triple.rgbtBlue==0xff && triple.rgbtGreen==0xff && triple.rgbtRed==0xff))
             {
                 fwrite(&red,sizeof(RGBTRIPLE),1,outptr);
             }
             else
             {
                 fwrite(&triple,sizeof(RGBTRIPLE),1,outptr);
-            }
+            }*/
         }
 
         // skip over padding, if any
@@ -93,5 +97,11 @@ int main(int argc,char *argv[])
             fputc(0x00, outptr);
         }
     }
-    
+    fclose(inptr);
+
+    // close outfile
+    fclose(outptr);
+
+    // success
+    return 0;
 }
