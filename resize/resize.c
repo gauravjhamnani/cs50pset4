@@ -61,7 +61,40 @@ int main(int argc,char *argv[])
     
     fwrite(&bi,sizeof(BITMAPINFOHEADER),1,outptr);
     
+    if(scale<1)
+    {
+        scale=1/scale;
+         for (int i = 0, biHeight = abs(originalHeight); i < biHeight; i=i+scale)
+    {
+        // iterate over pixels in scanline
+        //for(int mn = 0;mn <scale ;mn++)
+        //{
+         fseek(inptr,bf.bfOffBits+i*(originalWidth*3+originalpadding),SEEK_SET);   
+        for (int j = 0; j <originalWidth; j=j+scale)
+        {
+            // temporary storage
+            RGBTRIPLE triple;
+
+            // read RGB triple from infile
+            fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
+            fseek(inptr,(scale-1)*3,SEEK_CUR);
+            //for(int m=0;m<scale;m++)
+            fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+        }
+
+        // skip over padding, if any
+        fseek(inptr, originalpadding, SEEK_CUR);
+
+        // then add it back (to demonstrate how)
+        for (int k = 0; k < padding; k++)
+        {
+            fputc(0x00, outptr);
+        }
+    }
     
+        
+    }
+    else{
     for (int i = 0, biHeight = abs(originalHeight); i < biHeight; i++)
     {
         // iterate over pixels in scanline
@@ -88,7 +121,7 @@ int main(int argc,char *argv[])
         {
             fputc(0x00, outptr);
         }
-    }}
+    }}}
     fclose(inptr);
     fclose(outptr);
     return 0;
